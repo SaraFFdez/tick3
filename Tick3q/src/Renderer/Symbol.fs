@@ -28,7 +28,15 @@ let posOf x y = {X=x;Y=y} // helper
 
 /// write this for Tick3 using your modified ComponentType
 /// you may add to type definition in CommonTypes
-let makeBusDecoderComponent (pos:XYPos) (w: int) (a: int) (n: int) = failwithf "Not implemented"
+let makeBusDecoderComponent (pos:XYPos) (w: int) (a: int) (n: int) = 
+    let comp =  {
+        X = int pos.X
+        Y = int pos.Y
+        W = w 
+        H = n 
+        Type = BusDecoder (w,a,n) 
+    }
+    comp
 
 /// demo function - not needed for Tick3 answer
 let makeDummyComponent (pos: XYPos): Component =
@@ -55,7 +63,49 @@ let update (msg : Msg) (model : Model): Model*Cmd<'a>  =
 
 /// Tick3 answer
 let busDecoderView (comp: Component) = 
-    failwithf "Not implemented"
+    if typeof<Component> = comp 
+        then 
+            let fX = float comp.X
+            let fY = float comp.Y 
+            let w,a,n = comp.Type (w,a,n) 
+            let scaleFactor=1.0 // to demonstrate svg scaling
+            let rotation=0 // to demonstrate svg rotation (in degrees)
+            g   [ Style [ 
+                // the transform here does rotation, scaling, and translation
+             // the rotation and scaling happens with TransformOrigin as fixed point first
+                 TransformOrigin "0px 50px" // so that rotation is around centre of line
+                 Transform (sprintf "translate(%fpx,%fpx) rotate(%ddeg) scale(%f) " fX fY rotation scaleFactor )
+                ]
+
+                ]  // g optional attributes in first list
+            // use g svg element (SVG equivalent of div) to group any number of ReactElements into one.
+            // use transform with scale and/or translate and/or rotate to transform group
+                [
+                    polygon [ // a demo svg polygon triangle
+                        SVGAttr.Points "10,10 900,900 10,900"
+                        SVGAttr.StrokeWidth "5px"
+                        SVGAttr.Stroke "Black"
+                        SVGAttr.FillOpacity 0.1
+                        SVGAttr.Fill "Blue"] []
+                    line [X1 0.; Y1 0.; X2 0.; Y2 (100.) ; Style [Stroke "Black"]] [
+                // child elements of line do not display since children of svg are dom elements
+                // and svg will only display on svg canvas, not in dom.
+                 // hence this is not used
+                    ]
+                    text [ // a demo text svg element
+                        X 0.; 
+                        Y 100.; 
+                    Style [
+                        TextAnchor "middle" // left/right/middle: horizontal algnment vs (X,Y)
+                        DominantBaseline "hanging" // auto/middle/hanging: vertical alignment vs (X,Y)
+                        FontSize "10px"
+                        FontWeight "Bold"
+                        Fill "Blue" // demo font color
+                    ]
+                ] [str <| sprintf "X=%.0f Y=%.0f" fX fY] // child of text element is text to display
+            ]
+    else failwithf "The element provided is not a Component and cannot be viewed"
+    
 
 /// demo function can be deleted
 let busDecoderViewDummy (comp: Component) = 
