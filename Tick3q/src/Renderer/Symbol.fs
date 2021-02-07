@@ -30,11 +30,16 @@ let posOf x y = {X=x;Y=y} // helper
 /// you may add to type definition in CommonTypes
 let makeBusDecoderComponent (pos:XYPos) (w: int) (a: int) (n: int) = 
     let comp =  {
-        X = int pos.X
+        Type = BusDecoder (w,a,n);
+        X = int pos.X;
+        Y = int pos.Y;
+        H = 17+10*n;
+        W = 60;
+        (*X = int pos.X
         Y = int pos.Y
         W = w 
         H = n 
-        Type = BusDecoder (w,a,n) 
+        Type = BusDecoder (w,a,n) *)
     }
     comp
 
@@ -62,8 +67,8 @@ let update (msg : Msg) (model : Model): Model*Cmd<'a>  =
 //----------------------------View Function for Symbol----------------------------//
 
 /// Tick3 answer
-let busDecoderView (comp: Component) = 
-    if typeof<Component> = comp 
+let busDecoderView (comp: Component) =
+    (*if typeof<Component> = comp 
         then 
             let fX = float comp.X
             let fY = float comp.Y 
@@ -104,8 +109,8 @@ let busDecoderView (comp: Component) =
                     ]
                 ] [str <| sprintf "X=%.0f Y=%.0f" fX fY] // child of text element is text to display
             ]
-    else failwithf "The element provided is not a Component and cannot be viewed"
-    
+    else failwithf "The element provided is not a Component and cannot be viewed"*)
+    failwithf "RIP"
 
 /// demo function can be deleted
 let busDecoderViewDummy (comp: Component) = 
@@ -162,8 +167,8 @@ let busDecoderViewDummy (comp: Component) =
 /// View function - in this case view is independent of model
 let view (model : Model) (dispatch : Msg -> unit) =    
     [   // change for Tick3 answer
-        makeDummyComponent {X=100.; Y=20.} // for Tick 3 two components
-        makeDummyComponent {X=200.; Y=20.} 
+        makeBusDecoderComponent {X=100.; Y=20.} // for Tick 3 two components
+        makeBusDecoderComponent {X=200.; Y=20.} 
     ] 
     |> List.map busDecoderViewDummy // change for Tick3 answer
     |> (fun svgEls -> 
