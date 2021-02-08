@@ -75,7 +75,7 @@ let busDecoderView (comp: Component) =
             let fY = float comp.Y 
             // in real code w,a,n would come from the component, but as the busDecoder case is not yet written this
             // is a workaround compatible with the dummy components
-            let w,a,n = if fX < 100. then (3,0,8) else (4,3,5) // workaround
+            let w,a,n = decComp comp // workaround
             //
             // This code demonstrates svg transformations, not needed for Tick3 but useful.
             // The elmish react syntax here uses CSS style transforms, not SVG attribute transforms. They are different.
@@ -124,8 +124,8 @@ let busDecoderView (comp: Component) =
         
         
                         text [ // a demo text svg element
-                            X -20.; 
-                            Y 70.; 
+                            X -23.; 
+                            Y 50.; 
                             Style [
                                 TextAnchor "middle" // left/right/middle: horizontal algnment vs (X,Y)
                                 DominantBaseline "hanging" // auto/middle/hanging: vertical alignment vs (X,Y)
@@ -233,8 +233,8 @@ let busDecoderViewDummy (comp: Component) =
 /// View function - in this case view is independent of model
 let view (model : Model) (dispatch : Msg -> unit) =    
     [   // change for Tick3 answer
-        makeBusDecoderComponent {X=70.; Y=20.} 69 7 8// for Tick 3 two components
-        makeBusDecoderComponent {X=200.; Y=20.} 69 7 5
+        makeBusDecoderComponent {X=70.; Y=20.} 3 0 8// for Tick 3 two components
+        makeBusDecoderComponent {X=200.; Y=20.} 4 3 5
     ] 
     |> List.map busDecoderView // change for Tick3 answer
     |> (fun svgEls -> 
@@ -256,10 +256,10 @@ type ValidateError =
 let busDecoderValidate (comp:Component) : Result<Component, ValidateError*string> =
     if(isaComponent)
         then
-            let w,a,n = (1,0,2) //comp.Type(BusDecoder (w,a,n)) 
-            if (n<0) then Error (NIsInvalid, "n is invalid")
-            else if (float(a)>((2.0**float(w))-1.0)) then Error (AIsInvalid, "A is invalid")
-            else if (float(a+n) > (2.0**float(w))) then Error (NIsInvalid, "N is invalid")
+            let w,a,n = decComp comp //comp.Type(BusDecoder (w,a,n)) 
+            if (w<1) then Error (WIsInvalid, "w is invalid")
+            else if (float(a)>((2.0**float(w))-1.0)) || (a<0)then Error (AIsInvalid, "A is invalid")
+            else if (float(a+n) > (2.0**float(w))) || (n<1) then Error (NIsInvalid, "N is invalid")
             else Ok comp
     else failwithf "Component was not correct"
     
